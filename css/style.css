@@ -203,3 +203,18 @@ ol.ol-list>li:nth-child(10n+10):before {
 ol.ol-list>li+li {
     margin-top: 2rem;
 }
+
+
+/* --------------------------- Pages ----------------------------- */
+
+#pages{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#pages img {
+    width: 55%;
+    object-fit: cover;
+}
