@@ -29,17 +29,14 @@ async function getMangaChapterImageData(params){
     if(res_chapters && res_chapters.data.pageCount > 0){
         res_chapters.data.pages.forEach(async (page, i) => {
             const search_pages  = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'page/?p=', encodeURI(page.pageFullUrl)], false, '^');
-            print(search_pages);
+            // print(search_pages);
             setTimeout(async () => {
                 const page_res = await axios.get(search_pages);
     
                 print(page_res.data.pageImage.imageSource);
-                if(page_res && page_res.status == 200 &&  page_res.data) images.push(page_res.data.pageImage.imageSource);
-                if(i == images.length)
-                    return images;
+                if(page_res && page_res.status == 200 &&  page_res.data) getSingle('#pages').appendChild(await genList(page_res.data.pageImage.imageSource));
             }, 320);
         });
-
     }
 
     // const res = await axios.get(search_term);
