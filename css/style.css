@@ -107,7 +107,7 @@ ol {
     box-sizing: border-box;
 }
 
-ol.ol-list>li>a{
+ol.ol-list>li>a {
     color: mediumorchid;
     text-decoration: none;
     font-size: x-large;
@@ -207,7 +207,7 @@ ol.ol-list>li+li {
 
 /* --------------------------- Pages ----------------------------- */
 
-#pages{
+#pages {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -218,4 +218,24 @@ ol.ol-list>li+li {
     width: 55%;
     margin: 0.3em;
     object-fit: cover;
+}
+
+#controls {
+    display: none;
+    width: 100%;
+    padding: 1em;
+    font-size: 22px;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: papayawhip;
+}
+
+#controls a{
+    text-decoration: none;
+    color: black;
+}
+
+#controls a:hover{
+    text-decoration: none;
+    color: blue;
 }

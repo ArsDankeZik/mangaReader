@@ -4,43 +4,80 @@ const ROOT_API_MANGA = 'http://www.mangareader.net';
 let URL_SEARCH_TERMS = 'https://mighty-journey-70253.herokuapp.com/search?t=';
 
 
-async function searchManga(name){
-    const search_term  = fmt('^^^', [F_CORS_HEROKU, URL_SEARCH_TERMS, encodeURI(name)], false, '^');
+async function searchManga(name) {
+    let search_term = fmt('^^^', [F_CORS_HEROKU, URL_SEARCH_TERMS, encodeURI(name)], false, '^');
+
+    if((await ping('http://localhost:3003')) == true)
+        search_term = fmt('^^^', ['http://localhost:3003/', 'search/?t=', encodeURI(name)], false, '^');
+
     const res = await axios.get(search_term);
-    if(res && res.data.resultCount != 0) return res.data;
+    if (res && res.data.resultCount != 0) return res.data;
     return [];
 }
 
-async function getMangaChapters(name){
+async function getMangaChapters(name) {
     const FORMAT = 'comic/?c=';
-    const search_term  = fmt('^^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, FORMAT, ROOT_API_MANGA,encodeURI(name)], false, '^');
+    let search_term = fmt('^^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, FORMAT, ROOT_API_MANGA, encodeURI(name)], false, '^');
+
+    if((await ping('http://localhost:3003')) == true)
+        search_term = fmt('^^^', ['http://localhost:3003/', FORMAT, ROOT_API_MANGA+encodeURI(name)], false, '^');
+
     const res = await axios.get(search_term);
-    print(res);
-    if(res && res.data.resultCount != 0) return res.data;
+    if (res && res.data.resultCount != 0) {
+        localStorage.setItem('manga', JSON.stringify(res.data));
+        return res.data;
+    }
     return [];
 }
 
-async function getMangaChapterImageData(params){
-    const search_chapters = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'chapters/?c=', encodeURI(params)], false, '^');
-    const res_chapters = await axios.get(search_chapters);
-    let images = [];
-    print(res_chapters);
+async function getMangaChapterImageData(params) {
+    try{
+        let search_chapters = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'chapters/?c=', encodeURI(params)], false, '^');
 
-    if(res_chapters && res_chapters.data.pageCount > 0){
-        res_chapters.data.pages.forEach(async (page, i) => {
-            const search_pages  = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'page/?p=', encodeURI(page.pageFullUrl)], false, '^');
-            // print(search_pages);
-            setTimeout(async () => {
-                const page_res = await axios.get(search_pages);
+        if((await ping('http://localhost:3003')) == true)
+            search_term = fmt('^^^', ['http://localhost:3003/', 'chapters/?c=', encodeURI(name)], false, '^');
     
-                print(page_res.data.pageImage.imageSource);
-                if(page_res && page_res.status == 200 &&  page_res.data) getSingle('#pages').appendChild(await genList(page_res.data.pageImage.imageSource));
-            }, 320);
-        });
-    }
+        const res_chapters = await axios.get(search_chapters);
+    
+        if (res_chapters && res_chapters.data.pageCount > 0) {
+            res_chapters.data.pages.forEach(async (page, i) => {
+                let search_pages = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'page/?p=', encodeURI(page.pageFullUrl)], false, '^');
+    
+                if((await ping('http://localhost:3003')) == true)
+                    search_pages = fmt('^^^', ['http://localhost:3003/', 'page/?p=', encodeURI(page.pageFullUrl)], false, '^');
 
-    // const res = await axios.get(search_term);
-    // if(res.status == 200 && res.data) return res.data;
+                // print(search_pages);
+                axios.get(search_pages).then(page_res => {
+                    if (page_res && page_res.status == 200 && page_res.data) {
+                        createDOMElement('img', '', {class: 'generic-manga-page', src: page_res.data.pageImage.imageSource})
+                        .then(dom => getSingle('#pages').appendChild(dom));
+                    }
+                })
+            });
+        }
+        
+        setTimeout(()=>{
+            getSingle('#controls').style.display = 'flex';
+            const posCur = JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl).indexOf(params);
+            const posMax = JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl).length;
+
+            print(posCur);
+            if(posCur == 0){
+                getSingle('#back').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur]);
+                getSingle('#next').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur+1]);
+            }else if(posCur > 0 && posCur < posMax-1){
+                getSingle('#back').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur-1]);
+                getSingle('#next').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur+1]);
+            }else if(posCur == posMax-1){
+                getSingle('#back').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur-1]);
+                getSingle('#next').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur]);
+            }
+        }, 1000);
+    
+    }catch(err){
+        warn(err);
+    }
+    
     return [];
 }
 

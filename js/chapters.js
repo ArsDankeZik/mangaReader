@@ -7,7 +7,7 @@
 
 async function search(e){
     const res = await getMangaChapters(e);
-    print(res);
+    // print(res);
 
     if(res.chapterCount > 0){
         getSingle('#chapters').appendChild(await genList(res));

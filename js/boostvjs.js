@@ -18,6 +18,22 @@ const listener = (e) => JSON.parse(fmt('{"%": "%"}', [e.key, e.keyCode]));
 const eql = (str_1, str_2) => typeof (str_1) == 'string' ? str_1.toLowerCase() == str_2.toLowerCase() : str_1 == str_2;
 const searchIsEmpty = () => document.location.search.length == 0;
 
+
+const ping = (URL) =>  {
+    return new Promise(resolve => {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                resolve(true);
+            } 
+            else if(this.readyState == 4 && this.status != 200) resolve(false);
+        };
+        xhttp.open("GET", URL, true);
+        xhttp.timeout = 1000;
+        xhttp.send();
+    });
+}
+
 const range = (start, end) => {
     let aux = [];
     for (let i = start; i < end; i++) aux.push(i);
