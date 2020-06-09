@@ -216,5 +216,6 @@ ol.ol-list>li+li {
 
 #pages img {
     width: 55%;
+    margin: 0.3em;
     object-fit: cover;
 }
