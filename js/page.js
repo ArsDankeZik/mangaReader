@@ -17,6 +17,8 @@
     }
 })();
 
+gestureRL();
+
 async function search(e){
     const res = await getMangaChapterImageData(e);
 }
@@ -24,13 +26,4 @@ async function search(e){
 /**
  * Gestures
  */
-(async () => {
-    var myRegion = new ZingTouch.Region(document.body);
-    var myElement = document.getElementById('container');
 
-    myRegion.bind(myElement, 'swipe',  (e) => {
-        let grades = Math.floor(e.detail.data[0].currentDirection);
-        if(grades >= 180 && grades <= 190) getSingle('#next').click();
-        else if(grades >= 350 && grades <= 360) getSingle('#back').click();
-    });
-})();

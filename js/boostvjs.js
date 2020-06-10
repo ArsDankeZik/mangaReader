@@ -173,3 +173,23 @@ const selectIndexFromURL = (value, node) => {
         }
     }
 }
+
+
+function gestureRL(){
+    startMove = -1;
+    endMove = -1;
+
+    document.body.addEventListener('touchmove', (e) => {
+        endMove = e.touches[0].clientX;
+        
+        if((startMove - endMove) > 100){
+            getSingle('#next').click();
+        }else if((startMove - endMove) < -100){
+            getSingle('#back').click();
+        }
+    });
+
+    document.body.addEventListener('touchstart', (e) => {
+        startMove = e.touches[0].clientX;
+    });
+}
