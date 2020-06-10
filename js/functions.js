@@ -1,6 +1,9 @@
 GLOBAL_RESULT = [];
 
+
 (async () => {
+    localStorage.setItem('rootPathMangaReader', document.location.href);
+
     if(!searchIsEmpty()){
         if(has((await getJSONUrl(document.location.href)), 'q')) await search((await getJSONUrl(document.location.href)).q, true);
     }
