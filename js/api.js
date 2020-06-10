@@ -31,6 +31,7 @@ async function getMangaChapters(name) {
 }
 
 async function getMangaChapterImageData(params) {
+    timeStart('GetImages');
     try{
         let search_chapters = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'chapters/?c=', encodeURI(params)], false, '^');
 
@@ -69,7 +70,7 @@ async function getMangaChapterImageData(params) {
                             getSingle('#pages').appendChild(dom);
                     });
                 })
-            }, 4000)
+            }, 2500)
         }
         
         setTimeout(()=>{
@@ -88,12 +89,12 @@ async function getMangaChapterImageData(params) {
                 getSingle('#back').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur-1]);
                 getSingle('#next').href = './page.html?p='+encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur]);
             }
-        }, 5000);
+        }, 2800);
     
     }catch(err){
         warn(err);
     }
-    
+    timeEnd('GetImages');
     return [];
 }
 
