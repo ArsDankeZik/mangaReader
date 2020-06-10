@@ -239,3 +239,10 @@ ol.ol-list>li+li {
     text-decoration: none;
     color: blue;
 }
+
+@media (max-width:499px){
+    #pages img {
+        width: 99%;
+        margin: 0;
+    }
+}
