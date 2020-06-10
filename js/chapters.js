@@ -1,15 +1,17 @@
+gestures(localStorage.getItem('rootPathMangaReader'));
+
 (async () => {
     if (has((await getJSONUrl(document.location.href)), 'c')) {
         const term = (await getJSONUrl(document.location.href)).c;
         await search(term);
 
-        var myRegion = new ZingTouch.Region(document.body);
-        var myElement = document.getElementById('container');
+        // var myRegion = new ZingTouch.Region(document.body);
+        // var myElement = document.getElementById('container');
 
-        myRegion.bind(myElement, 'swipe', (e) => {
-            let grades = Math.floor(e.detail.data[0].currentDirection);
-            if (grades >= 180 && grades <= 190) window.location.replace(localStorage.getItem('rootPathMangaReader'));
-        });
+        // myRegion.bind(myElement, 'swipe', (e) => {
+        //     let grades = Math.floor(e.detail.data[0].currentDirection);
+        //     if (grades >= 180 && grades <= 190) window.location.replace(localStorage.getItem('rootPathMangaReader'));
+        // });
     }
 })();
 

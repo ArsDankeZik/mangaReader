@@ -193,3 +193,22 @@ function gestureRL(){
         startMove = e.touches[0].clientX;
     });
 }
+
+function gestures(left=null, right=null){
+    startMove = -1;
+    endMove = -1;
+
+    document.body.addEventListener('touchmove', (e) => {
+        endMove = e.touches[0].clientX;
+        
+        if(right && (startMove - endMove) > 100){
+            window.location.replace(right);
+        }else if(left && (startMove - endMove) < -100){
+            window.location.replace(left);
+        }
+    });
+
+    document.body.addEventListener('touchstart', (e) => {
+        startMove = e.touches[0].clientX;
+    });
+}
