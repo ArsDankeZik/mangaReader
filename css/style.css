@@ -216,8 +216,8 @@ ol.ol-list>li+li {
 
 #pages img {
     width: 65%;
-    margin: 0.3em;
-    object-fit: scale-down;
+    margin: 0.2em;
+    /* object-fit: scale-down; */
 }
 
 #controls {
