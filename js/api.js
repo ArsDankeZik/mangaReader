@@ -16,6 +16,10 @@ async function searchManga(name) {
 }
 
 async function getMangaChapters(name) {
+    const localStorageUrl = JSON.parse(localStorage.getItem('manga')).comicUrl;
+    
+    if(localStorageUrl == (ROOT_API_MANGA+name)) return JSON.parse(localStorage.getItem('manga'));
+
     const FORMAT = 'comic/?c=';
     let search_term = fmt('^^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, FORMAT, ROOT_API_MANGA, encodeURI(name)], false, '^');
 
