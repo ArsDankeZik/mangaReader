@@ -218,7 +218,6 @@ ol.ol-list>li+li {
     width: 65%;
     margin: 0.2em;
     object-fit: contain;
-    background-size: cover;
 }
 
 #controls {
@@ -243,7 +242,8 @@ ol.ol-list>li+li {
 
 @media (max-width:499px){
     #pages img {
-        width: 99%;
+        width: 89%;
         margin: 0;
+        padding: 0;
     }
 }
