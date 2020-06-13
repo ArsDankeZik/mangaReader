@@ -34,6 +34,43 @@ const ping = (URL) =>  {
     });
 }
 
+const ajax = {
+    get: (URL) => {
+        return new Promise(resolve => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    print(this);
+                    resolve(JSON.parse(this.responseText));
+                } 
+                else if(this.readyState == 4 && this.status != 200) resolve(this.responseText);
+            };
+            xhttp.open("GET", URL, true);
+            xhttp.timeout = 2000;
+            xhttp.send();
+        });
+    },
+    post: (URL, PARAMS) => {
+        return new Promise(resolve => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                } 
+                else if(this.readyState == 4 && this.status != 200) resolve(this.responseText);
+            };
+            xhttp.open("POST", URL, true);
+            xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+            xhttp.setRequestHeader("Access-Control-Allow-Headers", "X-PINGOTHER");
+            xhttp.setRequestHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            xhttp.setRequestHeader("Data-Type", "application/json");
+            xhttp.send(PARAMS);
+        });
+    }
+}
+
+
 const range = (start, end) => {
     let aux = [];
     for (let i = start; i < end; i++) aux.push(i);
