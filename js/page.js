@@ -22,8 +22,3 @@ gestureRL();
 async function search(e){
     const res = await getMangaChapterImageData(e);
 }
-
-/**
- * Gestures
- */
-

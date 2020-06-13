@@ -16,9 +16,11 @@ async function searchManga(name) {
 }
 
 async function getMangaChapters(name) {
-    const localStorageUrl = JSON.parse(localStorage.getItem('manga')).comicUrl;
-    
-    if(localStorageUrl == (ROOT_API_MANGA+name)) return JSON.parse(localStorage.getItem('manga'));
+    const localStorageUrl = JSON.parse(sessionStorage.getItem('manga')) ? JSON.parse(sessionStorage.getItem('manga')).comicUrl : null;
+    if(localStorageUrl == (ROOT_API_MANGA+name)) {
+        print('Get manga chapters from local storage!');
+        return JSON.parse(sessionStorage.getItem('manga'));
+    }
 
     const FORMAT = 'comic/?c=';
     let search_term = fmt('^^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, FORMAT, ROOT_API_MANGA, encodeURI(name)], false, '^');
@@ -28,7 +30,7 @@ async function getMangaChapters(name) {
 
     const res = await axios.get(search_term);
     if (res && res.data.resultCount != 0) {
-        localStorage.setItem('manga', JSON.stringify(res.data));
+        sessionStorage.setItem('manga', JSON.stringify(res.data));
         return res.data;
     }
     return [];
@@ -47,7 +49,7 @@ async function getMangaChapterImageData(params) {
         if (res_chapters && res_chapters.data.pageCount > 0) {
             obj_dame = {};
 
-            localStorage.setItem('links', '');
+            localStorage.clear('links');
             res_chapters.data.pages.forEach((page, i) => {
                 ping('http://localhost:3003').then(ping_res => {
                     let search_pages = fmt('^^^^', [F_CORS_HEROKU, ROOT_API_HEROKU, 'page/?p=', encodeURI(page.pageFullUrl)], false, '^');
@@ -58,7 +60,6 @@ async function getMangaChapterImageData(params) {
                             if (i == 1)
                                 localStorage.setItem('links', localStorage.getItem('links') + ';' + temp.substring(temp.lastIndexOf(' ') + 1) + '+' + page_res.data.pageImage.imageSource + ';');
                             localStorage.setItem('links', localStorage.getItem('links') + ';' + temp.substring(temp.lastIndexOf(' ') + 1) + '+' + page_res.data.pageImage.imageSource);
-
                         }
                     })
                 });
@@ -69,29 +70,30 @@ async function getMangaChapterImageData(params) {
                 atemp.forEach(ll => obj_dame[ll.split('+')[0]] = ll.split('+')[1]);
                 Object.entries(obj_dame).forEach(l => {
                     createDOMElement('img', '', { class: 'generic-manga-page', src: l[1], alt: l[0] })
-                        .then(dom => {
-                            if (l[1] != undefined)
-                                getSingle('#pages').appendChild(dom);
-                        });
+                    .then(dom => {
+                        if (l[1] != undefined)
+                            getSingle('#pages').appendChild(dom);
+                    });
                 })
             }, 2500)
         }
 
         setTimeout(() => {
             getSingle('#controls').style.display = 'flex';
-            const posCur = JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl).indexOf(params);
-            const posMax = JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl).length;
+            const jsonTempStorage = sessionStorage.getItem('manga');
+            const posCur = JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl).indexOf(params);
+            const posMax = JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl).length;
 
             print(posCur);
             if (posCur == 0) {
-                getSingle('#back').href = './page.html?p=' + encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur]);
-                getSingle('#next').href = './page.html?p=' + encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur + 1]);
+                getSingle('#back').href = './page.html?p=' + encodeURI(JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl)[posCur]);
+                getSingle('#next').href = './page.html?p=' + encodeURI(JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl)[posCur + 1]);
             } else if (posCur > 0 && posCur < posMax - 1) {
-                getSingle('#back').href = './page.html?p=' + encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur - 1]);
-                getSingle('#next').href = './page.html?p=' + encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur + 1]);
+                getSingle('#back').href = './page.html?p=' + encodeURI(JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl)[posCur - 1]);
+                getSingle('#next').href = './page.html?p=' + encodeURI(JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl)[posCur + 1]);
             } else if (posCur == posMax - 1) {
-                getSingle('#back').href = './page.html?p=' + encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur - 1]);
-                getSingle('#next').href = './page.html?p=' + encodeURI(JSON.parse(localStorage.getItem('manga')).chapters.map(x => x.chapterFullUrl)[posCur]);
+                getSingle('#back').href = './page.html?p=' + encodeURI(JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl)[posCur - 1]);
+                getSingle('#next').href = './page.html?p=' + encodeURI(JSON.parse(jsonTempStorage).chapters.map(x => x.chapterFullUrl)[posCur]);
             }
         }, 2800);
 

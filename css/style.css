@@ -84,9 +84,9 @@ body {
 /*------------------------ Chapters ------------------------*/
 
 #chapters {
-    width: 85%;
+    width: 75%;
     display: flex;
-    margin: 2em;
+    margin: 0 auto;
 }
 
 
