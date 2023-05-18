@@ -207,16 +207,22 @@ ol.ol-list>li+li {
 
 /* --------------------------- Pages ----------------------------- */
 
+.manga-read-imgs{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #pages {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
 }
 
 #pages img {
     width: 65%;
-    margin: 0.2em;
     object-fit: contain;
 }
 
@@ -228,16 +234,21 @@ ol.ol-list>li+li {
     flex-direction: row;
     justify-content: space-between;
     background-color: #333739;
+    position: fixed;
+    z-index: 999999;
+    bottom: 0;
+    left: 0;
 }
 
 #controls a{
     text-decoration: none;
     color: white;
+    margin: .5rem 3.5rem;
 }
 
 #controls a:hover{
     text-decoration: none;
-    color: blue;
+    color: orange;
 }
 
 @media (max-width:499px){

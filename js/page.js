@@ -17,6 +17,18 @@
     }
 })();
 
+document.addEventListener('keydown', function (event) {
+  if (event.key === '+') {
+    document.querySelectorAll('img').forEach(img => img.style.width = (parseFloat(img.width) * 1.02) + 'px');
+  }
+})
+
+document.addEventListener('keydown', function (event) {
+  if (event.key === '-') {
+    document.querySelectorAll('img').forEach(img => img.style.width = (parseFloat(img.width) / 1.02) + 'px');
+  }
+})
+
 gestureRL();
 
 async function search(e){

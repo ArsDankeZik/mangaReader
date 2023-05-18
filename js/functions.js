@@ -72,6 +72,7 @@ async function search(e, auto) {
 
 // DOM CREATION
 async function createResultCards(data) {
+    print(data);
     const parent_div = await createDOMElement('div', '', { id: data.id, class: 'r-div-container' });
     const side_a = await createDOMElement('div', '', { class: 'side_a' });
     const side_b = await createDOMElement('div', '', { class: 'side_b' });

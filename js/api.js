@@ -76,6 +76,8 @@ async function getMangaChapterImageData(params) {
         }
 
         if (res_chapters && res_chapters.data.length > 0) {
+            const lastImgPage = JSON.parse(sessionStorage.getItem('chapter_data'))[params].findLast(n => n.page);
+
             res_chapters.data.forEach((page, i) => {
                 if(ROOT_API_MANGA.includes('mangahere')) {
                     createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, referrerpolicy: "same-origin" })
@@ -83,12 +85,13 @@ async function getMangaChapterImageData(params) {
                         if (page.img != undefined)
                             getSingle('#pages').appendChild(dom);
                 });
-                } else {
-                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
-                        .then(dom => {
-                            if (page.img != undefined)
-                                getSingle('#pages').appendChild(dom);
-                    });
+            } else {
+                createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
+                    .then(dom => {
+                        if(lastImgPage.page == page.page) dom.style.marginBottom = '4rem';
+                        if (page.img != undefined) getSingle('#pages').appendChild(dom);
+
+                });
                 }
             });
         }
@@ -99,7 +102,6 @@ async function getMangaChapterImageData(params) {
             const posCur = sortedTempStorage.map(x => x.id).indexOf(params);
             const posMax = sortedTempStorage.map(x => x.id).length;
 
-            print(posCur);
             if (posCur == 0) {
                 getSingle('#back').href = './page.html?p=' + encodeURI(sortedTempStorage.map(x => x.id)[posCur]);
                 getSingle('#next').href = './page.html?p=' + encodeURI(sortedTempStorage.map(x => x.id)[posCur + 1]);
