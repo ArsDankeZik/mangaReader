@@ -20,19 +20,32 @@ async function getMangaChapters(id) {
     
     if(localStorageUrl == id) {
         print('Get manga chapters from local storage!');
+
+        if(ROOT_API_MANGA.includes('mangahere')) return JSON.parse(sessionStorage.getItem('manga')).chapters.map((obj) => {
+            const chapterNumber = parseFloat(obj.title.match(/Ch\.(\d+(?:\.\d+)?)/)[1], 10);
+            return { ...obj, chapterNumber };
+          });
+
         return JSON.parse(sessionStorage.getItem('manga')).chapters;
     }
 
-    const FORMAT = 'info/';
+    const FORMAT = ROOT_API_MANGA.includes('mangahere') ? 'info?id=' : 'info/';
     let search_term = fmt('^^^', [ROOT_API_MANGA, FORMAT, encodeURI(id)], false, '^');
 
     const res = await axios.get(search_term);
 
+    print(res.data)
     if (res && res.data && res.data.chapters.length != 0) {
         let temp_o = {};
         temp_o['chapters'] = res.data.chapters;
         temp_o['url'] = id;
         sessionStorage.setItem('manga', JSON.stringify(temp_o));
+
+        if(ROOT_API_MANGA.includes('mangahere')) return res.data.chapters.map((obj) => {
+            const chapterNumber = parseFloat(obj.title.match(/Ch\.(\d+(?:\.\d+)?)/)[1], 10);
+            return { ...obj, chapterNumber };
+          });
+
         return res.data.chapters;
     }
     return [];
@@ -41,9 +54,10 @@ async function getMangaChapters(id) {
 async function getMangaChapterImageData(params) {
     timeStart('GetImages');
     try {
-        const FORMAT = 'read/';
-        let search_chapters = fmt('^^^', [ROOT_API_MANGA, FORMAT, encodeURI(params)], false, '^');
+        const FORMAT = ROOT_API_MANGA.includes('mangahere') ? 'read?chapterId=' : 'read/';
 
+        let search_chapters = fmt('^^^', [ROOT_API_MANGA, FORMAT, encodeURI(params)], false, '^');
+        print(search_chapters);
         
         const res_chapters = {};
         res_chapters['chapter_url'] = params;
@@ -63,11 +77,19 @@ async function getMangaChapterImageData(params) {
 
         if (res_chapters && res_chapters.data.length > 0) {
             res_chapters.data.forEach((page, i) => {
-                createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}` })
+                if(ROOT_API_MANGA.includes('mangahere')) {
+                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, 'x-referer': page.headerForImage.Referer })
                     .then(dom => {
                         if (page.img != undefined)
                             getSingle('#pages').appendChild(dom);
+                });
+                } else {
+                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, 'x-referer': 'unsafe-url' })
+                        .then(dom => {
+                            if (page.img != undefined)
+                                getSingle('#pages').appendChild(dom);
                     });
+                }
             });
         }
 

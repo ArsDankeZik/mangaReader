@@ -9,7 +9,10 @@ gestures(localStorage.getItem('rootPathMangaReader'));
 
 async function search(e) {
     let res = await getMangaChapters(e);
-    res = res.sort((a, b) => Number(a.chapterNumber) - Number(b.chapterNumber)).filter(n => n.pages > 0);
+    
+    // print(res)
+    if(ROOT_API_MANGA.includes('mangahere')) res = res.sort((a, b) => Number(a.chapterNumber) - Number(b.chapterNumber));
+    else res = res.sort((a, b) => Number(a.chapterNumber) - Number(b.chapterNumber)).filter(n => n.pages > 0);
 
     if (res.length > 0) {
         getSingle('#chapters').appendChild(await genList(res));
