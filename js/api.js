@@ -79,24 +79,17 @@ async function getMangaChapterImageData(params) {
             const lastImgPage = JSON.parse(sessionStorage.getItem('chapter_data'))[params].findLast(n => n.page);
 
             res_chapters.data.forEach((page, i) => {
-                if(ROOT_API_MANGA.includes('mangahere')) {
-                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, loading: 'lazy', alt: `Page ${page.page}`, referrerpolicy: "same-origin" })
-                    .then(dom => {
-                        if (page.img != undefined)
-                            getSingle('#pages').appendChild(dom);
-                });
-            } else {
-                createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, loading: 'lazy', alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
+                createDOMElement('img', '', { width: 700, class: 'generic-manga-page', class: 'lazy',src: page.img, 'data-src': page.img, loading: 'lazy', alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
                     .then(dom => {
                         if(lastImgPage.page == page.page) dom.style.marginBottom = '4rem';
-                        if(page.page > 5) {
+                        if(page.page > 2) {
                             setTimeout(() => {
                                 if (page.img != undefined) getSingle('#pages').appendChild(dom);
-                            }, 1500);
+                            }, 2500);
                         }
 
                 });
-                }
+                
             });
         }
 
