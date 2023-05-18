@@ -95,7 +95,6 @@ ol {
     flex-wrap: wrap;
     align-items: center;
     flex-direction: row;
-    justify-content: center;
     justify-content: space-around;
 }
 
@@ -134,6 +133,7 @@ ol.ol-list>li {
     padding: 1rem 1rem 1rem 3rem;
     position: relative;
     margin: 2em;
+    width: 45%;
 }
 
 ol.ol-list>li::before,

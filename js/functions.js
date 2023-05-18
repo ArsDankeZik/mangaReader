@@ -20,16 +20,18 @@ async function search(e, auto) {
 
         if (isInSearchStorage(searchValue)) {
             mangas = getElementFromSearchStorage(searchValue);
+            GLOBAL_RESULT = mangas;
         } else {
             mangas = await searchManga(searchValue);
+            GLOBAL_RESULT = mangas;
             assingSearchResult(mangas);
         }
 
         removeChildsNode(getSingle('#results'));
 
-        if (mangas.resultCount > 0) {
+        if (mangas.length > 0) {
             changeURL(`${window.location.pathname}?q=${encodeURI(searchValue)}`);
-            mangas.results.forEach(async manga => {
+            mangas.forEach(async manga => {
                 getSingle('#results').appendChild(await createResultCards(manga));
             });
         }
@@ -45,16 +47,18 @@ async function search(e, auto) {
 
         if (isInSearchStorage(searchValue)) {
             mangas = getElementFromSearchStorage(searchValue);
+            GLOBAL_RESULT = mangas;
         } else {
             mangas = await searchManga(searchValue);
+            GLOBAL_RESULT = mangas;
             assingSearchResult(mangas);
         }
 
         changeURL(`${window.location.pathname}?q=${encodeURI(searchValue)}`);
         removeChildsNode(getSingle('#results'));
 
-        if (mangas.resultCount > 0) {
-            mangas.results.forEach(async manga => {
+        if (mangas.length > 0) {
+            mangas.forEach(async manga => {
                 getSingle('#results').appendChild(await createResultCards(manga));
             });
         }
@@ -68,18 +72,18 @@ async function search(e, auto) {
 
 // DOM CREATION
 async function createResultCards(data) {
-    const parent_div = await createDOMElement('div', '', { id: data.resultUrl.split('/')[1], class: 'r-div-container' });
+    const parent_div = await createDOMElement('div', '', { id: data.id, class: 'r-div-container' });
     const side_a = await createDOMElement('div', '', { class: 'side_a' });
     const side_b = await createDOMElement('div', '', { class: 'side_b' });
 
-    const title = await createDOMElement('a', data.resultName, { class: 'r-title-card', href: data.resultFullUrl, target: '_blank' });
-    const category = await createDOMElement('span', data.resultGenre, { class: 'r-category-card' });
-    const read = await createDOMElement('a', 'Read', { class: 'r-read-card', href: 'chapter.html?c=' + data.resultUrl });
+    const title = await createDOMElement('span', data.title, { class: 'r-title-card' });
+    const category = await createDOMElement('span', data.contentRating, { class: 'r-category-card' });
+    const read = await createDOMElement('a', 'Read', { class: 'r-read-card', href: 'chapter.html?c=' + `${data.id}` });
 
-    const image = await createDOMElement('img', '', { src: '', class: 'r-img-card', name: 'referrer', content: 'no-referrer' });
-    testImage(data.resultThumbImageUrl).then(x => image.src = x);
+    // const image = await createDOMElement('img', '', { src: '', class: 'r-img-card', name: 'referrer', content: 'no-referrer' });
+    // testImage(data.resultThumbImageUrl).then(x => image.src = x);
 
-    side_a.appendChild(image);
+    // side_a.appendChild(image);
 
     side_b.appendChild(title);
     side_b.appendChild(category);
@@ -109,7 +113,7 @@ function testImage(url) {
 function assingSearchResult(data) {
     if (JSON.parse(localStorage.getItem('searchResults')) && Object.entries(JSON.parse(localStorage.getItem('searchResults'))).length < 63) {
         let resultSearch = JSON.parse(localStorage.getItem('searchResults'));
-        resultSearch[data.searchTerm] = data;
+        data.map(name => resultSearch[name.title.toLowerCase()] = name)
         localStorage.setItem('searchResults', JSON.stringify(resultSearch));
 
         return true;
@@ -118,7 +122,7 @@ function assingSearchResult(data) {
         return false;
     } else if(!JSON.parse(localStorage.getItem('searchResults'))) {
         let resultSearch = {};
-        resultSearch[data.searchTerm] = data;
+        data.map(name => resultSearch[name.title.toLowerCase()] = name)
         localStorage.setItem('searchResults', JSON.stringify(resultSearch));
         return true;
     }
@@ -128,11 +132,11 @@ function assingSearchResult(data) {
 
 function isInSearchStorage(term) {
     const localSearch = localStorage.getItem('searchResults');
-    if (JSON.parse(localSearch)) return JSON.parse(localSearch).hasOwnProperty(term);
-    return false;
+    if (!localSearch) return false;
+    return localSearch.includes(`"${term}"`);
 }
 
 function getElementFromSearchStorage(term) {
     print('Get search result from local storage');
-    return JSON.parse(localStorage.getItem('searchResults'))[term];
+    return Object.values(JSON.parse(localStorage.getItem('searchResults')));
 }

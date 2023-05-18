@@ -8,22 +8,22 @@ gestures(localStorage.getItem('rootPathMangaReader'));
 })();
 
 async function search(e) {
-    const res = await getMangaChapters(e);
-    // print(res);
+    let res = await getMangaChapters(e);
+    res = res.sort((a, b) => Number(a.chapterNumber) - Number(b.chapterNumber)).filter(n => n.pages > 0);
 
-    if (res.chapterCount > 0) {
+    if (res.length > 0) {
         getSingle('#chapters').appendChild(await genList(res));
     }
 }
 
 async function genList(data) {
-    const term = (await getJSONUrl(document.location.href)).c.split('/')[1];
+    const term = (await getJSONUrl(document.location.href)).c;
     const div = await createDOMElement('div', '', { id: term });
     const ol = await createDOMElement('ol', '', { class: 'ol-list' })
 
-    data.chapters.forEach(async chapter => {
-        const li = await createDOMElement('li', '', { id: chapter.chapterTitle.split(' ').join('') });
-        const a = await createDOMElement('a', chapter.chapterTitle + ' - ' + (chapter.chapterDate), { href: './page.html?p=' + encodeURI(chapter.chapterFullUrl), target: '_blank' });
+    data.forEach(async chapter => {
+        const li = await createDOMElement('li', '', { id: chapter.title.split(' ').join('') });
+        const a = await createDOMElement('a', chapter.title, { href: './page.html?p=' + encodeURI(chapter.id) });
         li.appendChild(a);
         ol.appendChild(li);
     });
