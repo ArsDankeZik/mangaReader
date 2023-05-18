@@ -80,16 +80,20 @@ async function getMangaChapterImageData(params) {
 
             res_chapters.data.forEach((page, i) => {
                 if(ROOT_API_MANGA.includes('mangahere')) {
-                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, referrerpolicy: "same-origin" })
+                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, loading: 'lazy', alt: `Page ${page.page}`, referrerpolicy: "same-origin" })
                     .then(dom => {
                         if (page.img != undefined)
                             getSingle('#pages').appendChild(dom);
                 });
             } else {
-                createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
+                createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, loading: 'lazy', alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
                     .then(dom => {
                         if(lastImgPage.page == page.page) dom.style.marginBottom = '4rem';
-                        if (page.img != undefined) getSingle('#pages').appendChild(dom);
+                        if(page.page > 5) {
+                            setTimeout(() => {
+                                if (page.img != undefined) getSingle('#pages').appendChild(dom);
+                            }, 1500);
+                        }
 
                 });
                 }
