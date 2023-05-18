@@ -84,7 +84,7 @@ async function getMangaChapterImageData(params) {
                             getSingle('#pages').appendChild(dom);
                 });
                 } else {
-                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, 'x-referer': 'unsafe-url' })
+                    createDOMElement('img', '', { class: 'generic-manga-page', src: page.img, alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
                         .then(dom => {
                             if (page.img != undefined)
                                 getSingle('#pages').appendChild(dom);
