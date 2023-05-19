@@ -53,22 +53,23 @@ async function getMangaChapterImageData(params) {
         
         if(lastMangaReaded == -1 || lastMangaReaded != params) mangaSessionStorage.setLastReadChapterId(mangaInfo.title, params);
         
-        // Check if chapter is in local storage and has all pages loaded
         document.title = `${mangaInfo.title} - ${mangaInfo.chapters[params].chapterNumber}`;
         
+        // Check if chapter is in local storage and has all pages loaded
         if(mangaInfo.chapters[params] && Object.keys(mangaInfo.chapters[params].pages_loaded).length == mangaInfo.chapters[params].pages) {
             print('Get manga chapter images from local storage!');
-        } else {
+          } else {
             print('Get manga chapter images from API!');
             const res = (await axios.get(search_chapters)).data;
             if(res) mangaSessionStorage.writePagesLoaded(mangaInfo.title, params, res)
             else warn('No chapter found!');
-        }
-
-        const mangaPagesLoaded = mangaSessionStorage.readPagesLoaded(mangaInfo.title, params);
-        
-        if (mangaPagesLoaded && mangaPagesLoaded.length > 0) {
+          }
+          
+          const mangaPagesLoaded = mangaSessionStorage.readPagesLoaded(mangaInfo.title, params);
+          
+          if (mangaPagesLoaded && mangaPagesLoaded.length > 0) {
             const lastImgPage = mangaPagesLoaded.findLast(n => n.page);
+            print(`${lastImgPage.page} images!`);
 
             mangaPagesLoaded.forEach((page, i) => {
                 createDOMElement('img', '', { width: 700, class: 'generic-manga-page', class: 'lazy',src: '', 'data-src': page.img, loading: 'lazy', alt: `Page ${page.page}`, referrerpolicy: "no-referrer" })
