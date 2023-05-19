@@ -5,64 +5,137 @@ GLOBAL_RESULT = [];
 
     if (!searchIsEmpty()) {
         if (has((await getJSONUrl(document.location.href)), 'q')) await search((await getJSONUrl(document.location.href)).q, true);
-    }
+    } else recommendationList();
 })();
+
+
+document.addEventListener('keydown', (e) => {
+    if (e.key == 'Escape') {
+        getSingle('#navbar input').value = '';
+        removeChildsNode(getSingle('#results'));
+        recommendationList();
+    }
+});
 
 getSingle('#navbar input').addEventListener('keydown', async (e) => {
     await search(e, false);
 });
 
 async function search(e, auto) {
+    document.querySelector('.recommendationList').innerHTML = '';
+    if(auto && e == '') {
+        recommendationList();
+        return;
+    }
+
+    if(!auto && e.key == 'Enter' && e.currentTarget.value == '') {
+        recommendationList();
+        return;
+    }
+
     if (auto) {
         const searchValue = e;
+        const localSearch = searchValue ? mangaSessionStorage.search(searchValue) : null;
         let mangas = [];
         GLOBAL_RESULT = mangas;
 
-        if (isInSearchStorage(searchValue)) {
-            mangas = getElementFromSearchStorage(searchValue);
+        if (localSearch) {
+            print('Local search');
+            mangas = localSearch;
             GLOBAL_RESULT = mangas;
         } else {
+            print('Remote search');
             mangas = await searchManga(searchValue);
             GLOBAL_RESULT = mangas;
             assingSearchResult(mangas);
         }
 
+        if(!localSearch){
+            print('Fill session storage');
+            const giveFormat = (m) => {
+                return {[m.title]: {
+                    id: m?.id,
+                    title: m?.title,
+                    contentRating: m?.contentRating,
+                    lastChapter: m?.lastChapter,
+                    releaseDate: m?.releaseDate,
+                    status: m?.status
+                }};
+            };
+
+            mangas.map(m => {
+                let formated = giveFormat(m);
+                let title = Object.keys(formated)[0];
+                mangaSessionStorage.writeManga(title, formated[title]);
+            });
+
+            print(mangaSessionStorage.read('mangas'));
+            print(mangaSessionStorage.size());
+        }
+
         removeChildsNode(getSingle('#results'));
 
-        if (mangas.length > 0) {
+        print(mangas);
+        if (Object.values(mangas).length > 0) {
             changeURL(`${window.location.pathname}?q=${encodeURI(searchValue)}`);
-            mangas.forEach(async manga => {
+            Object.values(mangas).forEach(async manga => {
                 getSingle('#results').appendChild(await createResultCards(manga));
             });
         }
-        else if (mangas.length === 0)
+        else if (Object.values(mangas).length === 0)
             getSingle('#results').appendChild(await createDOMElement('span', fmt('No results for "%"!', [searchValue]), { class: 'no-results' }));
         else
             warn('No results!');
     }
     else if (!auto && e.key == 'Enter') {
         const searchValue = e.currentTarget.value.trim();
+        const localSearch = searchValue ? mangaSessionStorage.search(searchValue) : null;
         let mangas = [];
         GLOBAL_RESULT = mangas;
 
-        if (isInSearchStorage(searchValue)) {
-            mangas = getElementFromSearchStorage(searchValue);
+        if (localSearch) {
+            print('Local search');
+            mangas = localSearch;
             GLOBAL_RESULT = mangas;
         } else {
+            print('Remote search');
             mangas = await searchManga(searchValue);
             GLOBAL_RESULT = mangas;
             assingSearchResult(mangas);
         }
 
-        changeURL(`${window.location.pathname}?q=${encodeURI(searchValue)}`);
-        removeChildsNode(getSingle('#results'));
+        if(!localSearch){
+            print('Fill session storage');
+            const giveFormat = (m) => {
+                return {[m.title]: {
+                    id: m?.id,
+                    title: m?.title,
+                    contentRating: m?.contentRating,
+                    lastChapter: m?.lastChapter,
+                    releaseDate: m?.releaseDate,
+                    status: m?.status
+                }};
+            };
 
-        if (mangas.length > 0) {
-            mangas.forEach(async manga => {
+            mangas.map(m => {
+                let formated = giveFormat(m);
+                let title = Object.keys(formated)[0];
+                mangaSessionStorage.writeManga(title, formated[title]);
+            });
+            
+            print(mangaSessionStorage.read('mangas'));
+            print(mangaSessionStorage.size());
+        }
+
+        removeChildsNode(getSingle('#results'));
+        
+        if (Object.values(mangas).length > 0) {
+            changeURL(`${window.location.pathname}?q=${encodeURI(searchValue)}`);
+            Object.values(mangas).forEach(async manga => {
                 getSingle('#results').appendChild(await createResultCards(manga));
             });
         }
-        else if (mangas.length === 0)
+        else if (Object.values(mangas).length === 0)
             getSingle('#results').appendChild(await createDOMElement('span', fmt('No results for "%"!', [searchValue]), { class: 'no-results' }));
         else
             warn('No results!');
@@ -72,7 +145,6 @@ async function search(e, auto) {
 
 // DOM CREATION
 async function createResultCards(data) {
-    print(data);
     const parent_div = await createDOMElement('div', '', { id: data.id, class: 'r-div-container' });
     const side_a = await createDOMElement('div', '', { class: 'side_a' });
     const side_b = await createDOMElement('div', '', { class: 'side_b' });
@@ -140,4 +212,60 @@ function isInSearchStorage(term) {
 function getElementFromSearchStorage(term) {
     print('Get search result from local storage');
     return Object.values(JSON.parse(localStorage.getItem('searchResults')));
+}
+
+async function recommendationList() {
+    const saveToLocalStorage = (o) => {
+        const temp_localStorageObj = {
+          recommendations: o,
+          lastUpdated: new Date().getTime()
+        };
+        localStorage.setItem('recommendations', JSON.stringify(temp_localStorageObj));
+      };
+    
+      const lastUpdatedData = JSON.parse(localStorage.getItem('recommendations'));
+      const lastUpdated = lastUpdatedData ? lastUpdatedData.lastUpdated : -1;
+      const hours = Math.floor((new Date().getTime() - lastUpdated) / (1000 * 60 * 60));
+      print(`Last updated: ${hours} hours ago`);
+
+    
+      if (!lastUpdatedData || hours > 24 || lastUpdated === -1) {
+        const res = await axios.get(`${JIKAN_API}recommendations/manga`);
+        const data = res ? res.data.data.map(k => k.entry).flat().map((obj) => ({ ...obj })) : [];
+        print('Recommendations updated!');
+        saveToLocalStorage(data);
+      }
+    
+      const storedData = JSON.parse(localStorage.getItem('recommendations'));
+      const data = storedData ? storedData.recommendations : [];
+
+    if(data.length > 0) {
+        document.querySelector('.recommendationList').innerHTML = '';
+
+        data.forEach(async (data) => {
+            const card = await createDOMElement('div', '', { class: 'card', id: data.mal_id});
+            const cardImage = await createDOMElement('img', '', { class: 'card-img', src: '', alt: data.title, loading: 'lazy' });
+            const cardTitle = await createDOMElement('h4', data.title, { class: 'card-title' });
+            const cardButton = await createDOMElement('a', 'Read', { class: 'card-button', href: `./index.html?q=${data.title}` });
+
+            
+            card.appendChild(cardImage);
+            card.appendChild(cardTitle);
+            card.appendChild(cardButton);
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        cardImage.src = data.images.webp.image_url;
+                    }
+                });
+            });
+            observer.observe(card);
+
+            document.querySelector('.recommendationList').appendChild(card);
+        })
+
+    }
+
+    return;
 }

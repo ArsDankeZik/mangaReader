@@ -18,6 +18,22 @@ const listener = (e) => JSON.parse(fmt('{"%": "%"}', [e.key, e.keyCode]));
 const eql = (str_1, str_2) => typeof (str_1) == 'string' ? str_1.toLowerCase() == str_2.toLowerCase() : str_1 == str_2;
 const searchIsEmpty = () => document.location.search.length == 0;
 
+function getSessionStorageSize() {
+    let totalSize = 0;
+  
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      const itemSize = sessionStorage.getItem(key).length * 2; // Assuming each character is 2 bytes
+  
+      totalSize += key.length * 2 + itemSize;
+    }
+
+    const bytesToMb = (bytes) => {
+        return (bytes / (1024 * 1024)).toFixed(2); // Keep two decimal places
+      }
+  
+    return bytesToMb(totalSize)+'MB';
+  }
 
 const ping = (URL) =>  {
     return new Promise(resolve => {
