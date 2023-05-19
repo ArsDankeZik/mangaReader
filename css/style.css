@@ -340,4 +340,9 @@ ol.ol-list>li+li {
         margin: 0;
         padding: 0;
     }
+
+    ol{
+        width: 15rem;
+        overflow: hidden;
+    }
 }
