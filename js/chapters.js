@@ -26,13 +26,15 @@ async function genList(data) {
     const div = await createDOMElement('div', '', { id: term });
     const ol = await createDOMElement('ol', '', { class: 'ol-list' })
 
-    data.forEach(async chapter => {
-        const li = await createDOMElement('li', '', { id: chapter.title.split(' ').join('')+'-'+chapter.chapterNumber });
-        const a = await createDOMElement('a', chapter.title, { href: './page.html?p=' + encodeURI(chapter.id) });
-        li.appendChild(a);
-        ol.appendChild(li);
-    });
-
-    div.appendChild(ol);
+    if(data){
+        data.forEach(async chapter => {
+            const li = await createDOMElement('li', '', { id: chapter.title.split(' ').join('')+'-'+chapter.chapterNumber });
+            const a = await createDOMElement('a', chapter.title, { href: './page.html?p=' + encodeURI(chapter.id) });
+            li.appendChild(a);
+            ol.appendChild(li);
+        });
+    
+        div.appendChild(ol);
+    }
     return div;
 }
