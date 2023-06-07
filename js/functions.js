@@ -75,7 +75,6 @@ async function search(e, auto) {
 
         removeChildsNode(getSingle('#results'));
 
-        print(mangas);
         if (Object.values(mangas).length > 0) {
             changeURL(`${window.location.pathname}?q=${encodeURI(searchValue)}`);
             Object.values(mangas).forEach(async manga => {

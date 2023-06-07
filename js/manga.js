@@ -13,15 +13,21 @@ async function recentlyReaded(){
 
         recentlyReadedMangas.forEach(async (data) => {
           const li = await createDOMElement('li', '', {
-            id:
-              data.title.split(' ').join('') +
-              '-' +
-              data.chapterNumber,
+            id: data.title,
+            style: 'display:flex;justify-content:space-between;',
           })
           const a = await createDOMElement('a', data.title, {
             href: './page.html?p=' + encodeURI(data.chapters.last_read),
           })
+
+          const del = await createDOMElement('span', '❌', {
+            class: 'delete',
+            style: 'cursor:pointer;',
+            onclick: 'mangaSessionStorage.setLastReadChapterId("' + data.title + '", -1);this.parentNode.parentNode.removeChild(this.parentNode)',
+          })
+
           li.appendChild(a)
+          li.appendChild(del)
           ol.appendChild(li)
         })
 

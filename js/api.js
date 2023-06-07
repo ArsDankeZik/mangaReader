@@ -1,7 +1,6 @@
 const ROOT_API_MANGA = 'https://consumet-gamma.vercel.app/manga/mangadex/';
 const JIKAN_API = 'https://api.jikan.moe/v4/';
 
-
 async function searchManga(name) {
     let search_term = fmt('^^', [ROOT_API_MANGA, encodeURI(name)], false, '^');
 
