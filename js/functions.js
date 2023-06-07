@@ -214,6 +214,8 @@ function getElementFromSearchStorage(term) {
     return Object.values(JSON.parse(localStorage.getItem('searchResults')));
 }
 
+
+
 async function recommendationList() {
     const saveToLocalStorage = (o) => {
         const temp_localStorageObj = {
@@ -237,11 +239,17 @@ async function recommendationList() {
       }
     
       const storedData = JSON.parse(localStorage.getItem('recommendations'));
-      const data = storedData ? storedData.recommendations : [];
+      let data = storedData ? storedData.recommendations : [];
+
+      const removeDuplicates = (arr, prop) => {
+        return arr.filter((obj, index, self) => self.findIndex((o) => o[prop] === obj[prop]) === index);
+      } 
 
     if(data.length > 0) {
         document.querySelector('.recommendationList').innerHTML = '';
 
+        // console.log(data)
+        data = removeDuplicates(data, 'mal_id');
         data.forEach(async (data) => {
             const card = await createDOMElement('div', '', { class: 'card', id: data.mal_id});
             const cardImage = await createDOMElement('img', '', { class: 'card-img', src: '', alt: data.title, loading: 'lazy' });
